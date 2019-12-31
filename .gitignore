@@ -1,0 +1,12 @@
+.DS_Store
+.cache/
+.build*/
+bin/
+tmp/
+[0-9]
+[a-z].sh
+[0-9].log
+[0-9][0-9].log
+.DS_Store
+*.wav
+*.log
