@@ -2,6 +2,10 @@ cmake_minimum_required(VERSION 3.14)
 
 project(wavalign)
 
+# prefer minimal size by default
+set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_MINSIZEREL}")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_MINSIZEREL}")
+
 if(CMAKE_CONFIGURATION_TYPES) # https://stackoverflow.com/questions/31661264/cmake-generators-for-visual-studio-do-not-set-cmake-configuration-types
     set(CMAKE_CONFIGURATION_TYPES "Debug;Release" CACHE STRING "Debug/Release only" FORCE)
 endif()
@@ -55,10 +59,9 @@ if(${CMAKE_PROJECT_NAME} STREQUAL ${PROJECT_NAME})
 	)
 	    add_executable(${X})
 	    target_sources(${X} PRIVATE ${${X}_SRC})
+	    target_link_libraries(${X} libwavfile)
 	endforeach()
-    target_link_libraries(unittest_wavfmt libwavfile)
     target_link_libraries(wavalign libwavalign)
-    target_link_libraries(wavalign libwavfile)
 	target_include_directories(wavalign PRIVATE test/win32)
 	set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT wavalign)
 endif()
