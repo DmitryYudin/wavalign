@@ -47,9 +47,9 @@
 
 /* All the headers include this file. */
 #include <crtdefs.h>
+#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdarg.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -118,16 +118,16 @@ struct option /* specification for a long form option...	*/
     int val;          /* its associated status value		*/
 };
 
-enum                 /* permitted values for its `has_arg' field...	*/
-{ no_argument = 0,   /* option never takes an argument	*/
-  required_argument, /* option always requires an argument	*/
-  optional_argument  /* option may take an argument		*/
+enum /* permitted values for its `has_arg' field...	*/
+{
+    no_argument = 0,   /* option never takes an argument	*/
+    required_argument, /* option always requires an argument	*/
+    optional_argument  /* option may take an argument		*/
 };
 
-extern int getopt_long(int nargc, char *const *nargv, const char *options,
-                       const struct option *long_options, int *idx);
-extern int getopt_long_only(int nargc, char *const *nargv, const char *options,
-                            const struct option *long_options, int *idx);
+extern int getopt_long(int nargc, char *const *nargv, const char *options, const struct option *long_options, int *idx);
+extern int getopt_long_only(int nargc, char *const *nargv, const char *options, const struct option *long_options,
+                            int *idx);
 /*
  * Previous MinGW implementation had...
  */
@@ -171,7 +171,7 @@ char *optarg = NULL; /* pointer to current option argument */
 
 #define getopt_all_done -1 /* return code to indicate completion */
 
-enum { /* All `getopt' API functions are implemented via calls to the
+enum {                           /* All `getopt' API functions are implemented via calls to the
         * common static function `getopt_parse()'; these `mode' selectors
         * determine the behaviour of `getopt_parse()', to deliver the
         * appropriate result in each case.
@@ -181,7 +181,7 @@ enum { /* All `getopt' API functions are implemented via calls to the
        getopt_mode_long_only     /* getopt_long_only() */
 };
 
-enum { /* When attempting to match a command line argument to a long form
+enum {                           /* When attempting to match a command line argument to a long form
         * option, these indicate the status of the match.
         */
        getopt_no_match = 0,      /* no successful match			     */
@@ -199,14 +199,13 @@ int optopt = getopt_unknown; /* return value for option being evaluated   */
 #define optreset __mingw_optreset
 int optreset = 0;
 
-static int getopt_missing_arg(const CHAR *optstring) {
+static int getopt_missing_arg(const CHAR *optstring)
+{
     /* Helper function to determine the appropriate return value,
      * for the case where a required option argument is missing.
      */
-    if ((*optstring == getopt_pluschar) || (*optstring == getopt_switchar))
-        ++optstring;
-    return (*optstring == getopt_takes_argument) ? getopt_takes_argument
-                                                 : getopt_unknown;
+    if ((*optstring == getopt_pluschar) || (*optstring == getopt_switchar)) ++optstring;
+    return (*optstring == getopt_takes_argument) ? getopt_takes_argument : getopt_unknown;
 }
 
 /* `complain' macro facilitates the generation of simple built-in
@@ -216,8 +215,8 @@ static int getopt_missing_arg(const CHAR *optstring) {
 #define complain(MSG, ARG) \
     if (opterr) fprintf(stderr, "%s: " MSG "\n", PROGNAME, ARG)
 
-static int getopt_argerror(int mode, char *fmt, CHAR *prog, struct option *opt,
-                           int retval) {
+static int getopt_argerror(int mode, char *fmt, CHAR *prog, struct option *opt, int retval)
+{
     /* Helper function, to generate more complex built-in error
      * messages, for invalid arguments to long form options ...
      */
@@ -257,7 +256,8 @@ static int getopt_argerror(int mode, char *fmt, CHAR *prog, struct option *opt,
 #define getopt_set_conventions 0x1000
 #define getopt_posixly_correct 0x0010
 
-static int getopt_conventions(int flags) {
+static int getopt_conventions(int flags)
+{
     static int conventions = 0;
 
     if ((conventions == 0) && ((flags & getopt_set_conventions) == 0)) {
@@ -280,18 +280,19 @@ static int getopt_conventions(int flags) {
     return conventions;
 }
 
-static int is_switchar(CHAR flag) {
+static int is_switchar(CHAR flag)
+{
     /* A simple helper function, used to identify the switch character
      * introducing an optional command line argument.
      */
     return flag == getopt_switchar;
 }
 
-static const CHAR *getopt_match(CHAR lookup, const CHAR *opt_string) {
+static const CHAR *getopt_match(CHAR lookup, const CHAR *opt_string)
+{
     /* Helper function, used to identify short form options.
      */
-    if ((*opt_string == getopt_pluschar) || (*opt_string == getopt_switchar))
-        ++opt_string;
+    if ((*opt_string == getopt_pluschar) || (*opt_string == getopt_switchar)) ++opt_string;
     if (*opt_string == getopt_takes_argument) ++opt_string;
     do
         if (lookup == *opt_string) return opt_string;
@@ -299,7 +300,8 @@ static const CHAR *getopt_match(CHAR lookup, const CHAR *opt_string) {
     return NULL;
 }
 
-static int getopt_match_long(const CHAR *nextchar, const CHAR *optname) {
+static int getopt_match_long(const CHAR *nextchar, const CHAR *optname)
+{
     /* Helper function, used to identify potential matches for
      * long form options.
      */
@@ -340,9 +342,9 @@ static int getopt_match_long(const CHAR *nextchar, const CHAR *optname) {
                : getopt_exact_match;
 }
 
-static int getopt_resolved(int mode, int argc, CHAR *const *argv, int *argind,
-                           struct option *opt, int index, int *retindex,
-                           const CHAR *optstring) {
+static int getopt_resolved(int mode, int argc, CHAR *const *argv, int *argind, struct option *opt, int index,
+                           int *retindex, const CHAR *optstring)
+{
     /* Helper function to establish appropriate return conditions,
      * on resolution of a long form option.
      */
@@ -359,9 +361,8 @@ static int getopt_resolved(int mode, int argc, CHAR *const *argv, int *argind,
          * it is an error for the user to specify an option specific argument
          * with an option which doesn't expect one!
          */
-        return getopt_argerror(mode,
-                               "option `%s%s' doesn't accept an argument\n",
-                               PROGNAME, opt + index, getopt_unknown);
+        return getopt_argerror(mode, "option `%s%s' doesn't accept an argument\n", PROGNAME, opt + index,
+                               getopt_unknown);
 
     else if ((optarg == NULL) && (opt[index].has_arg == required_argument)) {
         /* similarly, it is an error if no argument is specified
@@ -377,8 +378,7 @@ static int getopt_resolved(int mode, int argc, CHAR *const *argv, int *argind,
         else
             /* so fail this case, only if no such argument exists!
              */
-            return getopt_argerror(mode, "option `%s%s' requires an argument\n",
-                                   PROGNAME, opt + index,
+            return getopt_argerror(mode, "option `%s%s' requires an argument\n", PROGNAME, opt + index,
                                    getopt_missing_arg(optstring));
     }
 
@@ -396,7 +396,8 @@ static int getopt_resolved(int mode, int argc, CHAR *const *argv, int *argind,
     return opt[index].val;
 }
 
-static int getopt_verify(const CHAR *nextchar, const CHAR *optstring) {
+static int getopt_verify(const CHAR *nextchar, const CHAR *optstring)
+{
     /* Helper function, called by getopt_parse() when invoked
      * by getopt_long_only(), to verify when an unmatched or an
      * ambiguously matched long form option string is valid as
@@ -438,7 +439,8 @@ static int getopt_verify(const CHAR *nextchar, const CHAR *optstring) {
 static
 #define getopt_std_args int argc, CHAR *const argv[], const CHAR *optstring
     int
-    getopt_parse(int mode, getopt_std_args, ...) {
+    getopt_parse(int mode, getopt_std_args, ...)
+{
     /* Common core implementation for ALL `getopt' functions.
      */
     static int argind = 0;
@@ -587,21 +589,18 @@ static
         /* save temporary copies of the arguments which are associated
          * with the current option ...
          */
-        for (index = 0; index < optspan; ++index)
-            this_arg[index] = arglist[optmark + index];
+        for (index = 0; index < optspan; ++index) this_arg[index] = arglist[optmark + index];
 
         /* move all preceding non-option arguments to the right,
          * overwriting these saved arguments, while making space
          * to replace them in their permuted location.
          */
-        for (--optmark; optmark >= optbase; --optmark)
-            arglist[optmark + optspan] = arglist[optmark];
+        for (--optmark; optmark >= optbase; --optmark) arglist[optmark + optspan] = arglist[optmark];
 
         /* restore the temporarily saved option arguments to
          * their permuted location.
          */
-        for (index = 0; index < optspan; ++index)
-            arglist[optbase + index] = this_arg[index];
+        for (index = 0; index < optspan; ++index) arglist[optbase + index] = this_arg[index];
 
         /* adjust `optbase', to account for the relocated option.
          */
@@ -652,8 +651,7 @@ static
                         /* move all preceding non-option arguments to the right
                          * ...
                          */
-                        do
-                            arglist[optmark] = arglist[optmark - 1];
+                        do arglist[optmark] = arglist[optmark - 1];
                         while (optmark-- > optbase);
 
                         /* reinstate the `--' marker, in its permuted location.
@@ -702,8 +700,7 @@ static
                 for (lookup = 0; longopts && longopts[lookup].name; ++lookup) {
                     /* scan the list of defined long form options ...
                      */
-                    switch (
-                        getopt_match_long(nextchar, longopts[lookup].name)) {
+                    switch (getopt_match_long(nextchar, longopts[lookup].name)) {
                         /* looking for possible matches for the current
                          * argument.
                          */
@@ -715,9 +712,7 @@ static
                              * any subsequent characters as short form options.
                              */
                             nextchar = NULL;
-                            return getopt_resolved(mode, argc, argv, &argind,
-                                                   longopts, lookup, optindex,
-                                                   optstring);
+                            return getopt_resolved(mode, argc, argv, &argind, longopts, lookup, optindex, optstring);
 
                         case getopt_abbreviated_match:
                             /*
@@ -736,8 +731,7 @@ static
                                      * may proceed to interpret it as such.
                                      */
                                     && getopt_verify(nextchar, optstring))
-                                    return getopt_parse(mode, argc, argv,
-                                                        optstring);
+                                    return getopt_parse(mode, argc, argv, optstring);
 
                                 /* If we get to here, then the ambiguously
                                  * matched partial long option isn't valid for
@@ -748,8 +742,7 @@ static
                                 optopt = 0;
                                 nextchar = NULL;
                                 optind = argind + 1;
-                                complain("option `%s' is ambiguous",
-                                         argv[argind]);
+                                complain("option `%s' is ambiguous", argv[argind]);
                                 return getopt_unknown;
                             }
                             /* otherwise just note that we've found a possible
@@ -763,8 +756,7 @@ static
                      * match, so return it, as for an exact match.
                      */
                     nextchar = NULL;
-                    return getopt_resolved(mode, argc, argv, &argind, longopts,
-                                           matched, optindex, optstring);
+                    return getopt_resolved(mode, argc, argv, &argind, longopts, matched, optindex, optstring);
                 }
                 /* if here, then we had what SHOULD have been a long form
                  * option, but it is unmatched ...
@@ -828,17 +820,16 @@ static
 /* All three public API entry points are trivially defined,
  * in terms of the internal `getopt_parse' function.
  */
-int getopt(getopt_std_args) {
-    return getopt_parse(getopt_mode_standard, argc, argv, optstring);
-}
+int getopt(getopt_std_args) { return getopt_parse(getopt_mode_standard, argc, argv, optstring); }
 
-int getopt_long(getopt_std_args, const struct option *opts, int *index) {
+int getopt_long(getopt_std_args, const struct option *opts, int *index)
+{
     return getopt_parse(getopt_mode_long, argc, argv, optstring, opts, index);
 }
 
-int getopt_long_only(getopt_std_args, const struct option *opts, int *index) {
-    return getopt_parse(getopt_mode_long_only, argc, argv, optstring, opts,
-                        index);
+int getopt_long_only(getopt_std_args, const struct option *opts, int *index)
+{
+    return getopt_parse(getopt_mode_long_only, argc, argv, optstring, opts, index);
 }
 
 #ifdef __weak_alias
@@ -846,8 +837,7 @@ int getopt_long_only(getopt_std_args, const struct option *opts, int *index) {
  * These Microsnot style uglified aliases are provided for compatibility
  * with the previous MinGW implementation of the getopt API.
  */
-__weak_alias(getopt, _getopt) __weak_alias(getopt_long, _getopt_long)
-    __weak_alias(getopt_long_only, _getopt_long_only)
+__weak_alias(getopt, _getopt) __weak_alias(getopt_long, _getopt_long) __weak_alias(getopt_long_only, _getopt_long_only)
 #endif
 
 #ifdef __cplusplus

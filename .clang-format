@@ -1,0 +1,19 @@
+---
+BasedOnStyle: Google
+---
+Language:        Cpp
+# BasedOnStyle:  Google
+AccessModifierOffset: -4 # -1
+AlignEscapedNewlines: DontAlign
+BreakBeforeBraces: Custom
+BraceWrapping:
+  AfterFunction:   true
+ColumnLimit:     120
+FixNamespaceComments: true
+ShortNamespaceLines: 30
+IncludeBlocks:   Preserve
+IndentWidth:     4
+PenaltyBreakComment: 1000
+ReflowComments:  false
+SpacesBeforeTrailingComments: 1 # 2
+...
