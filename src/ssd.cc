@@ -7,6 +7,7 @@
 #include "xcorr.h"
 
 #include <cassert>
+#include <cmath>
 #include <memory>
 
 #define SCOPE_ARRAY(type, name, len) \

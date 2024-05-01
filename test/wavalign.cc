@@ -14,6 +14,7 @@
 #include <stdio.h>
 #include <algorithm>
 #include <cassert>
+#include <cstring>
 #include <memory>
 
 #define DEFAUL_CORRLEN_MS 3000
